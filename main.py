@@ -17,56 +17,75 @@ class MainApp(QMainWindow):
         self.canvas.fill(Qt.white)
 
         #Central widget and layout
-        central_widget = QWidget(self)
-        self.setCentralWidget(central_widget)
-        layout = QVBoxLayout(central_widget)
-
-        #Add the pencil button
-        self.pencil_button = QPushButton("Pencil", self)
-        self.pencil_button.setCheckable(True)
-        self.pencil_button.clicked.connect(self.activate_pencil)
-        layout.addWidget(self.pencil_button)
-
-        #Add the canvas Qlabel
-        self.label_canvas = QLabel(self)    
+        self.label_canvas = QLabel(self)
         self.label_canvas.setPixmap(self.canvas)
-        layout.addWidget(self.label_canvas)
+
+        #center the canvas
+        self.label_canvas.setGeometry(50, 100, self.canvas_size * self.pixel_size, self.canvas_size * self.pixel_size)
 
         #Drawing state
         self.drawing = False
-        self.pencil_active = False
+        self.activate_tool = None #Pencil or eraser
+
+        #Connect the pencil button
+        self.ui.Pencil.setCheckable(True)
+        self.ui.Pencil.clicked.connect(self.activate_pencil)
+
+        #connect the eraser button
+        self.ui.eraser.setCheckable(True)
+        self.ui.eraser.clicked.connect(self.activate_eraser)
+
+    def activate_eraser(self):
+        """Activate the eraser"""
+        if self.ui.eraser.isChecked():
+            print("Eraser activated")
+            self.activate_tool = "eraser"
+            self.ui.Pencil.setChecked(False) #Desactivate the pencil
+        else: 
+            print("Eraser deactivated")
+            self.activate_tool = None
 
         
     def activate_pencil(self):
         """Activate the pencil"""
-        if self.pencil_button.isChecked():
+        if self.ui.Pencil.isChecked():
             print("Pencil activated")
-            self.pencil_active = True
+            self.activate_tool = "Pencil"
+            self.ui.eraser.setChecked(False) #Desactivate the eraser
         else:
             print("Pencil deactivated")
-            self.pencil_active = False    
+            self.activate_tool = None 
+
+    def mouseMoveEvent(self, event):
+        """Continue drawing or erasing while mouse is moving"""
+        if self.drawing and self.label_canvas.underMouse():
+            self.modify_pixel(event)       
 
     def mousePressEvent(self, event):
         """Mouse button pressed"""
-        if self.pencil_active and self.label_canvas.underMouse():
+        if self.activate_tool and self.label_canvas.underMouse():
             self.drawing = True
-            self.draw_Pixel(event)
+            self.modify_pixel(event)
 
     def mouseReleaseEvent(self, event):
         if event.button() == Qt.LeftButton:
             self.drawing = False
 
-    def draw_Pixel(self, event):
-        """Draw a pixel"""
+    def modify_pixel(self, event):
+        """Modify a pixel on the canvas  draw or erase"""
         x = (event.x() - self.label_canvas.x()) // self.pixel_size
         y = (event.y() - self.label_canvas.y()) // self.pixel_size
 
         if 0 <= x < self.canvas_size and 0 <= y < self.canvas_size:
             painter = QPainter(self.canvas)
-            painter.setPen(QColor (0, 0, 0))
-            painter.drawRect(x * self.pixel_size, y * self.pixel_size, self.pixel_size, self.pixel_size)
+            if self.activate_tool == "Pencil":
+                painter.fillRect(x * self.pixel_size, y * self.pixel_size, self.pixel_size, self.pixel_size, QColor(0, 0, 0))
+            elif self.activate_tool == "eraser":
+                painter.fillRect(x * self.pixel_size, y * self.pixel_size, self.pixel_size, self.pixel_size, QColor(255, 255, 255))
             painter.end()
-            self.label_canvas.setPixmap(self.canvas)                  
+            self.label_canvas.setPixmap(self.canvas)    
+
+                    
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
