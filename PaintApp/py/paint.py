@@ -11,13 +11,14 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
-class Ui_Qdrawer(object):
-    def setupUi(self, Qdrawer):
-        Qdrawer.setObjectName("Qdrawer")
-        Qdrawer.resize(500, 500)
-        Qdrawer.setMaximumSize(QtCore.QSize(500, 500))
-        self.horizontalLayoutWidget = QtWidgets.QWidget(Qdrawer)
-        self.horizontalLayoutWidget.setGeometry(QtCore.QRect(0, 0, 164, 51))
+class Ui_MainWindow(object):
+    def setupUi(self, MainWindow):
+        MainWindow.setObjectName("MainWindow")
+        MainWindow.resize(800, 600)
+        self.centralwidget = QtWidgets.QWidget(MainWindow)
+        self.centralwidget.setObjectName("centralwidget")
+        self.horizontalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
+        self.horizontalLayoutWidget.setGeometry(QtCore.QRect(0, 0, 239, 59))
         self.horizontalLayoutWidget.setObjectName("horizontalLayoutWidget")
         self.horizontalLayout = QtWidgets.QHBoxLayout(self.horizontalLayoutWidget)
         self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
@@ -25,15 +26,31 @@ class Ui_Qdrawer(object):
         self.Pencil = QtWidgets.QPushButton(self.horizontalLayoutWidget)
         self.Pencil.setObjectName("Pencil")
         self.horizontalLayout.addWidget(self.Pencil)
-        self.eraser = QtWidgets.QPushButton(self.horizontalLayoutWidget)
-        self.eraser.setObjectName("eraser")
-        self.horizontalLayout.addWidget(self.eraser)
+        self.Eraser = QtWidgets.QPushButton(self.horizontalLayoutWidget)
+        self.Eraser.setObjectName("Eraser")
+        self.horizontalLayout.addWidget(self.Eraser)
+        MainWindow.setCentralWidget(self.centralwidget)
+        self.menubar = QtWidgets.QMenuBar(MainWindow)
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 21))
+        self.menubar.setObjectName("menubar")
+        self.menuFile = QtWidgets.QMenu(self.menubar)
+        self.menuFile.setObjectName("menuFile")
+        self.menuEdit = QtWidgets.QMenu(self.menubar)
+        self.menuEdit.setObjectName("menuEdit")
+        MainWindow.setMenuBar(self.menubar)
+        self.statusbar = QtWidgets.QStatusBar(MainWindow)
+        self.statusbar.setObjectName("statusbar")
+        MainWindow.setStatusBar(self.statusbar)
+        self.menubar.addAction(self.menuFile.menuAction())
+        self.menubar.addAction(self.menuEdit.menuAction())
 
-        self.retranslateUi(Qdrawer)
-        QtCore.QMetaObject.connectSlotsByName(Qdrawer)
+        self.retranslateUi(MainWindow)
+        QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
-    def retranslateUi(self, Qdrawer):
+    def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        Qdrawer.setWindowTitle(_translate("Qdrawer", "Form"))
-        self.Pencil.setText(_translate("Qdrawer", "Pencil"))
-        self.eraser.setText(_translate("Qdrawer", "eraser"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        self.Pencil.setText(_translate("MainWindow", "Pencil"))
+        self.Eraser.setText(_translate("MainWindow", "eraser"))
+        self.menuFile.setTitle(_translate("MainWindow", "File"))
+        self.menuEdit.setTitle(_translate("MainWindow", "Edit"))

@@ -2,26 +2,32 @@ import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QPushButton, QLabel
 from PyQt5.QtGui import QPainter, QPixmap, QColor
 from PyQt5.QtCore import Qt, QPoint
-from PaintApp.py.paint import Ui_Qdrawer
+from PaintApp.py.paint import Ui_MainWindow
 
 class MainApp(QMainWindow):
     def __init__(self):
+        #test
         super().__init__()
-        self.ui = Ui_Qdrawer()
+        self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+        self.setFixedSize(self.size())
 
-        #Canvas initialization
-        self.canvas_size = 25
-        self.pixel_size = 25
-        self.canvas = QPixmap(self.canvas_size * self.pixel_size, self.canvas_size * self.pixel_size)
+        #Canvas configuration
+        self.canvas_size = 100
+        self.zoom_factor = 10
+    
+
+        self.canvas = QPixmap(self.canvas_size, self.canvas_size)
         self.canvas.fill(Qt.white)
 
-        #Central widget and layout
-        self.label_canvas = QLabel(self)
-        self.label_canvas.setPixmap(self.canvas)
+        #Label configuration 
+        self.label_canvas = QLabel(self.ui.centralwidget)
+        self.update_canvas_dipslay()
 
-        #center the canvas
-        self.label_canvas.setGeometry(50, 100, self.canvas_size * self.pixel_size, self.canvas_size * self.pixel_size)
+        #add the canvas to the layout
+        self.ui.verticalLayout = QVBoxLayout(self.ui.centralwidget)
+        self.ui.verticalLayout.addWidget(self.ui.horizontalLayoutWidget)
+        self.ui.verticalLayout.addWidget(self.label_canvas)
 
         #Drawing state
         self.drawing = False
@@ -32,12 +38,30 @@ class MainApp(QMainWindow):
         self.ui.Pencil.clicked.connect(self.activate_pencil)
 
         #connect the eraser button
-        self.ui.eraser.setCheckable(True)
-        self.ui.eraser.clicked.connect(self.activate_eraser)
+        self.ui.Eraser.setCheckable(True)
+        self.ui.Eraser.clicked.connect(self.activate_eraser)
+
+    def update_canvas_dipslay(self):
+        """Update the canvas display based on the zoom factor"""
+        zoomed_canvas = self.canvas.scaled(
+            int(self.canvas_size * self.zoom_factor),
+            int(self.canvas_size * self.zoom_factor),
+            Qt.IgnoreAspectRatio
+        )
+        self.label_canvas.setPixmap(zoomed_canvas)
+        self.label_canvas.setFixedSize(int(self.canvas_size * self.zoom_factor), int(self.canvas_size * self.zoom_factor))
+        self.adjustSize()
+
+    def wheelEvent(self, event):
+       delta = event.angleDelta().y() / 120
+       new_zoom = self.zoom_factor + delta
+       if 1 <= new_zoom <= 50:
+            self.zoom_factor = int(new_zoom)
+            self.update_canvas_dipslay()
 
     def activate_eraser(self):
         """Activate the eraser"""
-        if self.ui.eraser.isChecked():
+        if self.ui.Eraser.isChecked():
             print("Eraser activated")
             self.activate_tool = "eraser"
             self.ui.Pencil.setChecked(False) #Desactivate the pencil
@@ -51,7 +75,7 @@ class MainApp(QMainWindow):
         if self.ui.Pencil.isChecked():
             print("Pencil activated")
             self.activate_tool = "Pencil"
-            self.ui.eraser.setChecked(False) #Desactivate the eraser
+            self.ui.Eraser.setChecked(False) #Desactivate the eraser
         else:
             print("Pencil deactivated")
             self.activate_tool = None 
@@ -73,18 +97,23 @@ class MainApp(QMainWindow):
 
     def modify_pixel(self, event):
         """Modify a pixel on the canvas  draw or erase"""
-        x = (event.x() - self.label_canvas.x()) // self.pixel_size
-        y = (event.y() - self.label_canvas.y()) // self.pixel_size
+        local_pos = self.label_canvas.mapFromGlobal(event.globalPos())
+        x = int(local_pos.x() // self.zoom_factor)
+        y = int(local_pos.y() // self.zoom_factor)
 
         if 0 <= x < self.canvas_size and 0 <= y < self.canvas_size:
             painter = QPainter(self.canvas)
             if self.activate_tool == "Pencil":
-                painter.fillRect(x * self.pixel_size, y * self.pixel_size, self.pixel_size, self.pixel_size, QColor(0, 0, 0))
+                painter.drawPoint(x, y)
+                painter.setPen(QColor(Qt.black))
             elif self.activate_tool == "eraser":
-                painter.fillRect(x * self.pixel_size, y * self.pixel_size, self.pixel_size, self.pixel_size, QColor(255, 255, 255))
+                painter.setPen(QColor(Qt.white))
+                painter.drawPoint(x, y)                
             painter.end()
             self.label_canvas.setPixmap(self.canvas)    
 
+            zoomed_canvas = self.canvas.scaled(self.canvas_size * self.zoom_factor, self.canvas_size * self.zoom_factor, Qt.IgnoreAspectRatio)
+            self.label_canvas.setPixmap(zoomed_canvas)
                     
 
 if __name__ == "__main__":
