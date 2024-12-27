@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>836</width>
-    <height>600</height>
+    <width>830</width>
+    <height>673</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -51,9 +51,9 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>370</y>
+      <y>340</y>
       <width>161</width>
-      <height>171</height>
+      <height>201</height>
      </rect>
     </property>
     <property name="frameShape">
@@ -101,14 +101,27 @@
      </property>
     </widget>
    </widget>
+   <widget class="QLineEdit" name="lineEdit">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>560</y>
+      <width>113</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>000000000</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>836</width>
-     <height>21</height>
+     <width>830</width>
+     <height>18</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

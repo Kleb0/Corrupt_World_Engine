@@ -4,6 +4,7 @@ from PyQt5.QtGui import QPainter, QPixmap, QColor # type: ignore
 from PyQt5.QtCore import Qt, QPoint
 from PaintApp.py.paint import Ui_MainWindow
 from PaintApp.src.drawing_canvas import DrawingCanvas
+from PaintApp.src.color_wheel import ColorWheel
 
 
 class MainApp(QMainWindow):
@@ -14,6 +15,10 @@ class MainApp(QMainWindow):
         self.ui.setupUi(self)
 
         self.drawing_canvas = DrawingCanvas(self.ui.DrawingFrame)
+
+        self.color_wheel = ColorWheel(self.ui.ColorDisplayFrame)
+        self.color_wheel.setGeometry(0, 0, self.ui.ColorDisplayFrame.width(), self.ui.ColorDisplayFrame.height())
+        self.color_wheel.show()
 
         self.adjust_drawing_canvas()
 
@@ -46,7 +51,14 @@ class MainApp(QMainWindow):
             self.drawing_canvas.set_tool("eraser")
             self.ui.Pencil.setChecked(False)
         else:
-            self.drawing_canvas.set_tool(None)             
+            self.drawing_canvas.set_tool(None)         
+
+    def update_selected_color(self, event):
+        """Update the selected color"""
+        self.color_wheel.mousePressEvent(event)
+        selected_color = self.color_wheel.selected_color
+        self.drawing_canvas.set_color(selected_color)
+        print(f"Selected color: {selected_color.name()}")            
 
 
 if __name__ == "__main__":
